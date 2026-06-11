@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 
 @Data
+@Builder
 public class PolicyResponse {
     private Long id;
     private String title;
