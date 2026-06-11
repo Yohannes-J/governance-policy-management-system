@@ -1,0 +1,19 @@
+package com.audit.audit_service.event;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class GovernanceEvent {
+
+    private String eventType;
+    private Long policyId;
+    private String actor;
+    private LocalDateTime timestamp;
+}
