@@ -24,7 +24,7 @@ public class KafkaProducerConfig {
 
     @Bean
     public ProducerFactory<String, GovernanceEvent> producerFactory() {
-        // Build ObjectMapper with Java 8 time support (LocalDateTime)
+
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
 
