@@ -27,4 +27,12 @@ public class JwtUtil {
                 .signWith(getSigningKey())
                 .compact();
     }
+    public boolean validateToken(String token) {
+        try {
+            getClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
