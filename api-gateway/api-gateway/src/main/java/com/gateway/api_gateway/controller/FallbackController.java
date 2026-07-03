@@ -21,4 +21,13 @@ public class FallbackController {
                 "timestamp", LocalDateTime.now().toString()
         ));
     }
+
+    @GetMapping("/audit")
+    public ResponseEntity<Map<String, Object>> auditFallback() {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of(
+                "status", 503,
+                "message", "Audit Service is currently unavailable. Please try again later.",
+                "timestamp", LocalDateTime.now().toString()
+        ));
+    }
 }
