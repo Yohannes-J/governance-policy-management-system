@@ -42,4 +42,12 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+    public String getUsername(String token) {
+        return getClaims(token).getSubject();
+    }
+
+
+    public String getRole(String token) {
+        return getClaims(token).get("role", String.class);
+    }
 }
