@@ -35,4 +35,11 @@ public class JwtUtil {
             return false;
         }
     }
+    public Claims getClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
 }
