@@ -29,4 +29,6 @@ public class AuthController {
         }
         return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
     }
+    public record LoginRequest(String username, String password) {}
+
 }
