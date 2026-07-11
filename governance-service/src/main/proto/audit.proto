@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.audit.audit_service.grpc";
+option java_outer_classname = "AuditProto";
+
+package audit;
+
+// Request to get audit logs for a specific policy
+message GetAuditLogsRequest {
+  int64 policy_id = 1;
+}
+
+// A single audit log entry
+message AuditLogEntry {
+  int64 id = 1;
+  string event_type = 2;
+  int64 policy_id = 3;
+  string actor = 4;
+  string timestamp = 5;
+}
+
+// Response containing a list of audit log entries
+message GetAuditLogsResponse {
+  repeated AuditLogEntry logs = 1;
+}
+
+// The AuditService gRPC service definition
+service AuditService {
+  rpc GetAuditLogsByPolicy(GetAuditLogsRequest) returns (GetAuditLogsResponse);
+}

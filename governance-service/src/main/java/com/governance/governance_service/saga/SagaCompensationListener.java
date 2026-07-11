@@ -3,11 +3,11 @@ package com.governance.governance_service.saga;
 import com.governance.governance_service.entity.Policy;
 import com.governance.governance_service.entity.PolicyStatus;
 import com.governance.governance_service.repository.PolicyRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -15,6 +15,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class SagaCompensationListener {
+
     private final PolicyRepository policyRepository;
 
     @KafkaListener(
@@ -43,4 +44,3 @@ public class SagaCompensationListener {
         }
     }
 }
-

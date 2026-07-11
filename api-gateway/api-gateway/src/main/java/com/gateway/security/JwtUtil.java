@@ -1,4 +1,4 @@
-package com.gateway.api_gateway.security;
+package com.gateway.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -10,8 +10,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-
-
+@Component
 public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;

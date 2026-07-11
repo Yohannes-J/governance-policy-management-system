@@ -1,7 +1,6 @@
-package com.gateway.api_gateway.filter;
+package com.gateway.filter;
 
-
-import com.gateway.api_gateway.security.JwtUtil;
+import com.gateway.security.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;

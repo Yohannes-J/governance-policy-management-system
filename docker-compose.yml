@@ -1,10 +1,50 @@
 services:
+  postgres-governance:
+    image: postgres:15
+    container_name: postgres-governance
+    environment:
+      POSTGRES_DB: governance_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_governance_data:/var/lib/postgresql/data
+    networks:
+      - governance-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-audit:
+    image: postgres:15
+    container_name: postgres-audit
+    environment:
+      POSTGRES_DB: audit_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_audit_data:/var/lib/postgresql/data
+    networks:
+      - governance-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - governance-network
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
@@ -21,9 +61,26 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - governance-network
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
 
   redis:
     image: redis:7.2
     container_name: redis
     ports:
       - "6379:6379"
+    networks:
+      - governance-network
+
+volumes:
+  postgres_governance_data:
+  postgres_audit_data:
+
+networks:
+  governance-network:
+    driver: bridge
