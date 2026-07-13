@@ -6,26 +6,42 @@ option java_outer_classname = "AuditProto";
 
 package audit;
 
-// Request to get audit logs for a specific policy
+// ─── RecordAudit ────────────────────────────────────────────────────────────
+
+message RecordAuditRequest {
+  string event_type = 1;
+  int64  policy_id  = 2;
+  string actor      = 3;
+  string timestamp  = 4;
+}
+
+message RecordAuditResponse {
+  bool   success    = 1;
+  int64  audit_id   = 2;
+  string message    = 3;
+}
+
+// ─── GetAuditLogsByPolicy ────────────────────────────────────────────────────
+
 message GetAuditLogsRequest {
   int64 policy_id = 1;
 }
 
-// A single audit log entry
 message AuditLogEntry {
-  int64 id = 1;
+  int64  id         = 1;
   string event_type = 2;
-  int64 policy_id = 3;
-  string actor = 4;
-  string timestamp = 5;
+  int64  policy_id  = 3;
+  string actor      = 4;
+  string timestamp  = 5;
 }
 
-// Response containing a list of audit log entries
 message GetAuditLogsResponse {
   repeated AuditLogEntry logs = 1;
 }
 
-// The AuditService gRPC service definition
+// ─── Service ─────────────────────────────────────────────────────────────────
+
 service AuditService {
-  rpc GetAuditLogsByPolicy(GetAuditLogsRequest) returns (GetAuditLogsResponse);
+  rpc RecordAudit          (RecordAuditRequest)    returns (RecordAuditResponse);
+  rpc GetAuditLogsByPolicy (GetAuditLogsRequest)   returns (GetAuditLogsResponse);
 }

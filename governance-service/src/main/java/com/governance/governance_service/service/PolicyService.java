@@ -4,11 +4,11 @@ import com.governance.governance_service.dto.CreatePolicyRequest;
 import com.governance.governance_service.dto.PolicyResponse;
 import com.governance.governance_service.entity.Policy;
 import com.governance.governance_service.entity.PolicyStatus;
-import com.governance.governance_service.exception.InvalidStatusTransitionException;
 import com.governance.governance_service.exception.PolicyNotFoundException;
 import com.governance.governance_service.outbox.OutboxEvent;
 import com.governance.governance_service.outbox.OutboxEventRepository;
 import com.governance.governance_service.repository.PolicyRepository;
+import com.governance.governance_service.saga.PolicyApprovalSaga;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +24,7 @@ public class PolicyService {
 
     private final PolicyRepository policyRepository;
     private final OutboxEventRepository outboxEventRepository;
+    private final PolicyApprovalSaga policyApprovalSaga;
 
     @Transactional
     public PolicyResponse createPolicy(CreatePolicyRequest request) {
@@ -52,30 +53,22 @@ public class PolicyService {
         return toResponse(findOrThrow(id));
     }
 
-    @Transactional
+    /**
+     * Submit triggers Saga Step 1: DRAFT → PENDING_APPROVAL via the saga orchestrator.
+     */
     public PolicyResponse submitPolicy(Long id) {
         Policy policy = findOrThrow(id);
-        if (policy.getStatus() != PolicyStatus.DRAFT) {
-            throw new InvalidStatusTransitionException(policy.getStatus(), PolicyStatus.PENDING_APPROVAL);
-        }
-        policy.setStatus(PolicyStatus.PENDING_APPROVAL);
-        Policy saved = policyRepository.save(policy);
-        log.info("Submitted policy id={} for approval", id);
-        saveOutboxEvent("policy-submitted", saved.getId(), saved.getCreatedBy());
-        return toResponse(saved);
+        policyApprovalSaga.startApprovalSaga(id, policy.getCreatedBy());
+        return toResponse(findOrThrow(id));
     }
 
-    @Transactional
+    /**
+     * Approve triggers Saga Step 2: PENDING_APPROVAL → APPROVED via the saga orchestrator.
+     * The saga handles compensation automatically if anything fails.
+     */
     public PolicyResponse approvePolicy(Long id, String actor) {
-        Policy policy = findOrThrow(id);
-        if (policy.getStatus() != PolicyStatus.PENDING_APPROVAL) {
-            throw new InvalidStatusTransitionException(policy.getStatus(), PolicyStatus.APPROVED);
-        }
-        policy.setStatus(PolicyStatus.APPROVED);
-        Policy saved = policyRepository.save(policy);
-        log.info("Approved policy id={} by '{}'", id, actor);
-        saveOutboxEvent("policy-approved", saved.getId(), actor);
-        return toResponse(saved);
+        policyApprovalSaga.approveInSaga(id, actor);
+        return toResponse(findOrThrow(id));
     }
 
     @Transactional
