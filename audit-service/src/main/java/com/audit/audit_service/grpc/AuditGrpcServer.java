@@ -1,6 +1,5 @@
 package com.audit.audit_service.grpc;
 
-
 import com.audit.audit_service.entity.AuditLog;
 import com.audit.audit_service.repository.AuditLogRepository;
 import lombok.RequiredArgsConstructor;

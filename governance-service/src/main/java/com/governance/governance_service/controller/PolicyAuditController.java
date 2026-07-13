@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/policies/{id}/audit-logs")
 @RequiredArgsConstructor
@@ -22,9 +20,10 @@ public class PolicyAuditController {
     private final AuditGrpcClient auditGrpcClient;
 
     @GetMapping
-    @Operation(summary = "Get audit logs for a policy via internal call to audit-service")
-    public ResponseEntity<List<?>> getAuditLogs(
+    @Operation(summary = "Record an audit event for a policy via gRPC stub")
+    public ResponseEntity<Boolean> recordAudit(
             @Parameter(description = "Policy ID") @PathVariable Long id) {
-        return ResponseEntity.ok(auditGrpcClient.getAuditLogsForPolicy(id));
+        boolean result = auditGrpcClient.recordAudit("policy-queried", id, "system");
+        return ResponseEntity.ok(result);
     }
 }
